@@ -1,8 +1,9 @@
+import { useState } from 'react'
 import './App.css';
 import Category from './components/Category/Category'
 import CategoryItem from './components/CategoryItem/CategoryItem';
-import SearchFilter from './components/SearchFilter/SearchFilter';
 import CheckboxFilter from './components/CheckboxFilter/CheckboxFilter';
+import SearchFilter from './components/SearchFilter/SearchFilter';
 
 const products = [
   {category: "Sporting Goods", price: "$49.99", stocked: true, name: "Football"},
@@ -14,16 +15,24 @@ const products = [
 ];
 
 function App() {
-  const categories = [...new Set(products.map(i => i.category))]
+  const [searchValue, setSearchValue] = useState('')
+  const [onlyStocked, setOnlyStocked] = useState(false)
+
+  const categories = [...new Set(products.map(i => i.category))] // ['porting Goods', 'Electronics']
 
   const getCategoryItems = (catName) => {
-    return products.filter(p =>  p.category === catName)
+    return products.filter(product =>  {
+      const isInCategory = product.category === catName
+      const showNotStocked = onlyStocked ? product.stocked : true
+      const isSearched = product.name.toLowerCase().includes(searchValue)
+      return isInCategory && showNotStocked && isSearched
+    })
   }
 
   return (
     <div className="App">
-      <SearchFilter />
-      <CheckboxFilter />
+      <SearchFilter onInput={setSearchValue} />
+      <CheckboxFilter onCheck={setOnlyStocked} />
       {categories.map(cat => (
         <Category key={cat} categoryName={cat}>
           {getCategoryItems(cat).map(item => (
